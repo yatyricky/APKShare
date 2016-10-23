@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.baina.hackathon.wifiControl.WifiApControl;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.common.BitMatrix;
@@ -34,6 +35,14 @@ public class MainActivity extends AppCompatActivity {
                     ImageView imageView = (ImageView) findViewById(R.id.bitImg);
                     imageView.setImageBitmap(bitmap);
                 }
+            }
+        });
+
+        Button btnWifiAp = (Button) findViewById(R.id.wifiapBtn);
+        btnWifiAp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                WifiApControl.openWifiAp(getBaseContext(), "test-hot-pot", "123456789");
             }
         });
     }
