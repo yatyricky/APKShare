@@ -10,3 +10,6 @@
 
 # add items
 .idea
+
+# ux raw files
+/uxdesign/*
