@@ -42,7 +42,7 @@ public abstract class MyTimerCheck {
 
     /**
      * start
-     * @param times  How many times will check?
+     * @param timeOutCount  How many times will check?
      * @param sleepTime ms, Every check sleep time.
      */
     public void start(int timeOutCount, int sleepTime) {

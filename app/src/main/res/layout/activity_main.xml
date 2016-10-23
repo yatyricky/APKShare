@@ -34,4 +34,16 @@
         android:text="open wifi ap"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/httpServerBtn"
+        android:text="start server"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/ipText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ip:port"/>
 </android.support.v7.widget.LinearLayoutCompat>
