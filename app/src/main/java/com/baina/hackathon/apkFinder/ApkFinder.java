@@ -77,7 +77,8 @@ public class ApkFinder {
 
     public static String copyAppToSdcard(Context context, AppInfo app) {
         String pkgPath = app.getPkgPath();
-        String pkgName = app.getAppLabel();
-        return copyPkgToSdcard(context, pkgPath, pkgName);
+        String pkgName = app.getPkgName();
+        copyPkgToSdcard(context, pkgPath, pkgName);
+        return pkgName + ".apk";
     }
 }
