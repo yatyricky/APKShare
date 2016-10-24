@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final static int QR_WIDTH = 200;
     private final static int QR_HEIGHT = 200;
+    public final static String INTENT_KEY_APK_URI = "apk_uri";
 
     private Context context;
 
