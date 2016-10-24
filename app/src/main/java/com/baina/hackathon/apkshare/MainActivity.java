@@ -1,28 +1,38 @@
 package com.baina.hackathon.apkshare;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.baina.hackathon.httpServer.tempfiles.TempFilesServer;
+import com.baina.hackathon.apkFinder.AppInfo;
 import com.baina.hackathon.wifiControl.WifiApAdmin;
 import com.baina.hackathon.wifiControl.WifiApControl;
 
 import android.widget.ListView;
+import android.widget.Toast;
+
 import com.baina.hackathon.apkFinder.ApkFinder;
 import com.baina.hackathon.apkFinder.AppInfoAdapter;
 
 import org.nanohttpd.util.ServerRunner;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private final static int QR_WIDTH = 200;
     private final static int QR_HEIGHT = 200;
+    public final static String INTENT_KEY_APK_URI = "apk_uri";
 
     private Context context;
     private TempFilesServer fileServer;
@@ -73,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 textView.setText(ipAddress == null ? "null" : ipAddress);
             }
         });
-		
+
         Button btnApkFinder = (Button) findViewById(R.id.apkFinderBtn);
         btnApkFinder.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,7 +93,53 @@ public class MainActivity extends AppCompatActivity {
                 listView.setAdapter(a);
             }
         });
+
+        ListView listView = (ListView) findViewById(R.id.apkLst);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                AppInfoAdapter ada = (AppInfoAdapter) adapterView.getAdapter();
+                List<AppInfo> la = ada.getAppInfos();
+                AppInfo app = la.get(i);
+
+                ProgressDialog progress = new ProgressDialog(context);
+                progress.setMessage("Loading...");
+                new CopyTask(progress).execute(app);
+            }
+        });
     }
 
+    public void startLauncherActivity(View view) {
+        Intent intent = new Intent(this, ListOfInstalledApps.class);
+        startActivity(intent);
+    }
+
+    public class CopyTask extends AsyncTask<AppInfo, Integer, String> {
+
+        private ProgressDialog progress = null;
+
+        public CopyTask(ProgressDialog progress) {
+            this.progress = progress;
+        }
+
+        public void onPreExecute() {
+            progress.show();
+        }
+
+        public String doInBackground(AppInfo... params) {
+            AppInfo app = params[0];
+            String pkgPath = ApkFinder.copyAppToSdcard(context, app);
+            return pkgPath;
+        }
+
+        protected void onProgressUpdate(Integer... values) {
+
+        }
+
+        public void onPostExecute(String result) {
+            Toast.makeText(context, result, Toast.LENGTH_LONG);
+            progress.dismiss();
+        }
+    }
 
 }
