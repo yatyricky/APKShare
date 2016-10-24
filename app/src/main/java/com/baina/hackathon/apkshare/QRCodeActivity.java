@@ -29,7 +29,6 @@ public class QRCodeActivity extends AppCompatActivity {
         TextView textViewPassword = (TextView) findViewById(R.id.textViewPassword);
         textViewPassword.setText(password);
 
-//        WifiApControl.openWifiAp(getBaseContext(), "test-hot-pot", "123456789");
         enableServer();
         showQRCode(message);
     }

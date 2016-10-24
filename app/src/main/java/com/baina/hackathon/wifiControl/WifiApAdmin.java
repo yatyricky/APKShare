@@ -22,31 +22,50 @@ public class WifiApAdmin {
 
     private Context mContext = null;
 
+    private String mSSID = "";
+    private String mPasswd = "";
+
     public WifiApAdmin(Context context) {
         mContext = context;
+        if (mContext == null)
+        {
+            Log.e(TAG, "context is null");
+            return;
+        }
 
-        mWifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-
-        closeWifiAp(mWifiManager);
+        closeWifiAp();
     }
 
-    public static void closeWifiAp(Context context) {
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        closeWifiAp(wifiManager);
+    public String getSSID(){
+        return mSSID;
+    }
+
+    public String getPwd() {
+        return mPasswd;
     }
 
     @SuppressWarnings("deprecation") // Deprecated because it doesn't handle IPv6 but wifimanager only supports IPV4 anyway
-    public static String getGateway(Context context)
+    public String getGateway()
     {
-        final WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        if (mContext == null)
+        {
+            return "";
+        }
+        final WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
         DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
         return Formatter.formatIpAddress(dhcpInfo.gateway);
     }
 
-    private String mSSID = "";
-    private String mPasswd = "";
+    public enum WifiResult {
+        WIFI_START,
+        WIFI_FAIL
+    }
 
-    public void startWifiAp(String ssid, String passwd) {
+    public interface StartWifiApListener {
+        void onEvent(WifiResult status);
+    }
+
+    public void startWifiAp(String ssid, String passwd, final StartWifiApListener listener) {
         mSSID = ssid;
         mPasswd = passwd;
 
@@ -60,10 +79,11 @@ public class WifiApAdmin {
 
             @Override
             public void doTimerCheckWork() {
-                // TODO Auto-generated method stub
-
-                if (isWifiApEnabled(mWifiManager)) {
+                if (isWifiApEnabled()) {
                     Log.v(TAG, "Wifi enabled success!");
+                    if (listener != null) {
+                        listener.onEvent(WifiResult.WIFI_START);
+                    }
                     this.exit();
                 } else {
                     Log.v(TAG, "Wifi enabled failed!");
@@ -72,18 +92,18 @@ public class WifiApAdmin {
 
             @Override
             public void doTimeOutWork() {
-                // TODO Auto-generated method stub
+                if (listener != null) {
+                    listener.onEvent(WifiResult.WIFI_FAIL);
+                }
                 this.exit();
             }
         };
         timerCheck.start(15, 1000);
-
     }
 
-    public void startWifiAp() {
-        Method method1 = null;
+    private void startWifiAp() {
         try {
-            method1 = mWifiManager.getClass().getMethod("setWifiApEnabled",
+            Method method1 = mWifiManager.getClass().getMethod("setWifiApEnabled",
                     WifiConfiguration.class, boolean.class);
             WifiConfiguration netConfig = new WifiConfiguration();
 
@@ -125,9 +145,17 @@ public class WifiApAdmin {
         }
     }
 
-    public static void closeWifiAp(WifiManager wifiManager) {
-        if (isWifiApEnabled(wifiManager)) {
+    public void closeWifiAp() {
+        mSSID = "";
+        mPasswd = "";
+
+        if (mContext == null) {
+            return;
+        }
+
+        if (isWifiApEnabled()) {
             try {
+                WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
                 Method method = wifiManager.getClass().getMethod("getWifiApConfiguration");
                 method.setAccessible(true);
 
@@ -151,12 +179,18 @@ public class WifiApAdmin {
         }
     }
 
-    private static boolean isWifiApEnabled(WifiManager wifiManager) {
+    public boolean isWifiApEnabled() {
         try {
+            if (mContext == null) {
+                mSSID = "";
+                mPasswd = "";
+                return false;
+            }
+
+            WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
             Method method = wifiManager.getClass().getMethod("isWifiApEnabled");
             method.setAccessible(true);
             return (Boolean) method.invoke(wifiManager);
-
         } catch (NoSuchMethodException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -164,7 +198,8 @@ public class WifiApAdmin {
             e.printStackTrace();
         }
 
+        mSSID = "";
+        mPasswd = "";
         return false;
     }
-
 }

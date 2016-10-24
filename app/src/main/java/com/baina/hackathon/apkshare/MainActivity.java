@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -14,11 +15,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.baina.hackathon.httpServer.http.FilesServer;
 import com.baina.hackathon.apkFinder.AppInfo;
 import com.baina.hackathon.httpServer.http.TransferServer;
 import com.baina.hackathon.wifiControl.WifiApAdmin;
-import com.baina.hackathon.wifiControl.WifiApControl;
 
 import android.widget.ListView;
 import android.widget.Toast;
@@ -38,13 +37,16 @@ public class MainActivity extends AppCompatActivity {
     public final static String INTENT_KEY_PASSWORD = "ap_password";
 
     private Context context;
-    private FilesServer fileServer;
+
+    private WifiApAdmin wifiApAdmin = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = this;
+
+        wifiApAdmin = new WifiApAdmin(this);
 
         Button btn = (Button)findViewById(R.id.dimensionalBtn);
         btn.setOnClickListener(new View.OnClickListener() {
@@ -63,7 +65,19 @@ public class MainActivity extends AppCompatActivity {
         btnWifiAp.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                WifiApControl.openWifiAp(getBaseContext(), "test-hot-pot-yi", "123456789");
+                if (!wifiApAdmin.isWifiApEnabled()){
+                    wifiApAdmin.startWifiAp(Build.MODEL, "123456789", new WifiApAdmin.StartWifiApListener() {
+                        @Override
+                        public void onEvent(WifiApAdmin.WifiResult status) {
+                            switch (status) {
+                                case WIFI_START:
+                                    break;
+                                case WIFI_FAIL:
+                                    break;
+                            }
+                        }
+                    });
+                }
             }
         });
 
@@ -71,8 +85,6 @@ public class MainActivity extends AppCompatActivity {
         btnStartServer.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-//                fileServer = new FilesServer();
-//                ServerRunner.executeInstance(fileServer);
                 TransferServer server = new TransferServer(8080);
                 server.setRootDir(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + getPackageName());
                 ServerRunner.executeInstance(server);
@@ -84,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 TextView textView = (TextView) findViewById(R.id.ipText);
-                String ipAddress = WifiApAdmin.getGateway(getBaseContext());
+                String ipAddress = wifiApAdmin.getGateway();
                 textView.setText(ipAddress == null ? "null" : ipAddress);
             }
         });
