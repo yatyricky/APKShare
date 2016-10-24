@@ -1,8 +1,11 @@
 package com.baina.hackathon.apkshare;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -17,6 +20,8 @@ import com.baina.hackathon.wifiControl.WifiApAdmin;
 import com.baina.hackathon.wifiControl.WifiApControl;
 
 import android.widget.ListView;
+import android.widget.Toast;
+
 import com.baina.hackathon.apkFinder.ApkFinder;
 import com.baina.hackathon.apkFinder.AppInfoAdapter;
 
@@ -90,7 +95,10 @@ public class MainActivity extends AppCompatActivity {
                 AppInfoAdapter ada = (AppInfoAdapter) adapterView.getAdapter();
                 List<AppInfo> la = ada.getAppInfos();
                 AppInfo app = la.get(i);
-                String pkgPath = ApkFinder.copyAppToSdcard(context, app);
+
+                ProgressDialog progress = new ProgressDialog(context);
+                progress.setMessage("Loading...");
+                new CopyTask(progress).execute(app);
             }
         });
     }
@@ -98,6 +106,34 @@ public class MainActivity extends AppCompatActivity {
     public void startLauncherActivity(View view) {
         Intent intent = new Intent(this, ListOfInstalledApps.class);
         startActivity(intent);
+    }
+
+    public class CopyTask extends AsyncTask<AppInfo, Integer, String> {
+
+        private ProgressDialog progress = null;
+
+        public CopyTask(ProgressDialog progress) {
+            this.progress = progress;
+        }
+
+        public void onPreExecute() {
+            progress.show();
+        }
+
+        public String doInBackground(AppInfo... params) {
+            AppInfo app = params[0];
+            String pkgPath = ApkFinder.copyAppToSdcard(context, app);
+            return pkgPath;
+        }
+
+        protected void onProgressUpdate(Integer... values) {
+
+        }
+
+        public void onPostExecute(String result) {
+            Toast.makeText(context, result, Toast.LENGTH_LONG);
+            progress.dismiss();
+        }
     }
 
 }
