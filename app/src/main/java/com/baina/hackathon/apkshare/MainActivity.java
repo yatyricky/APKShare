@@ -1,6 +1,7 @@
 package com.baina.hackathon.apkshare;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 textView.setText(ipAddress == null ? "null" : ipAddress);
             }
         });
-		
+
         Button btnApkFinder = (Button) findViewById(R.id.apkFinderBtn);
         btnApkFinder.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,5 +80,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void startLauncherActivity(View view) {
+        Intent intent = new Intent(this, ListOfInstalledApps.class);
+        startActivity(intent);
+    }
 
 }
