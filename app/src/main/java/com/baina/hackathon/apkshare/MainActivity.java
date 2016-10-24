@@ -13,7 +13,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.baina.hackathon.httpServer.tempfiles.TempFilesServer;
+import com.baina.hackathon.httpServer.http.FilesServer;
 import com.baina.hackathon.apkFinder.AppInfo;
 import com.baina.hackathon.wifiControl.WifiApAdmin;
 import com.baina.hackathon.wifiControl.WifiApControl;
@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     public final static String INTENT_KEY_PASSWORD = "ap_password";
 
     private Context context;
-    private TempFilesServer fileServer;
+    private FilesServer fileServer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +69,7 @@ public class MainActivity extends AppCompatActivity {
         btnStartServer.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                fileServer = new TempFilesServer();
-                fileServer.setTempFileManagerFactory(new TempFilesServer.ExampleManagerFactory());
+                fileServer = new FilesServer();
                 ServerRunner.executeInstance(fileServer);
             }
         });
