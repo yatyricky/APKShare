@@ -6,10 +6,12 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.baina.hackathon.apkFinder.AppInfo;
 import com.baina.hackathon.httpServer.NHttpFileServer;
 import com.baina.hackathon.wifiControl.WifiApAdmin;
 import com.baina.hackathon.wifiControl.WifiApControl;
@@ -17,7 +19,8 @@ import com.baina.hackathon.wifiControl.WifiApControl;
 import android.widget.ListView;
 import com.baina.hackathon.apkFinder.ApkFinder;
 import com.baina.hackathon.apkFinder.AppInfoAdapter;
-import com.baina.hackathon.wifiControl.WifiApControl;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -77,6 +80,17 @@ public class MainActivity extends AppCompatActivity {
                 AppInfoAdapter a = new AppInfoAdapter(context, ApkFinder.queryAppInfo(context));
                 ListView listView = (ListView) findViewById(R.id.apkLst);
                 listView.setAdapter(a);
+            }
+        });
+
+        ListView listView = (ListView) findViewById(R.id.apkLst);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                AppInfoAdapter ada = (AppInfoAdapter) adapterView.getAdapter();
+                List<AppInfo> la = ada.getAppInfos();
+                AppInfo app = la.get(i);
+                String pkgPath = ApkFinder.copyAppToSdcard(context, app);
             }
         });
     }
