@@ -134,6 +134,9 @@ public class WifiApAdmin {
             netConfig.allowedGroupCiphers
                     .set(WifiConfiguration.GroupCipher.TKIP);
 
+            int networkId = wifiManager.addNetwork(netConfig);
+            wifiManager.enableNetwork(networkId, true);
+
             method1.invoke(wifiManager, netConfig, true);
 
         } catch (IllegalArgumentException e) {
