@@ -100,6 +100,9 @@ public class QRCodeActivity extends AppCompatActivity {
             }
         };
 
+        if (this.wifiApAdmin.isWifiApEnabled(this)) {
+            this.wifiApAdmin.closeWifiAp(this);
+        }
         this.wifiApAdmin.startWifiAp(getBaseContext(), ssid, password, wifiApListener);
     }
 }
