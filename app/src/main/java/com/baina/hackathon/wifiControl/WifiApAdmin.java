@@ -1,5 +1,6 @@
 package com.baina.hackathon.wifiControl;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -18,22 +19,20 @@ import java.util.Enumeration;
 public class WifiApAdmin {
     public static final String TAG = "WifiApAdmin";
 
-    private WifiManager mWifiManager = null;
-
-    private Context mContext = null;
+    private static WifiApAdmin s_wifiApAdmin = null;
 
     private String mSSID = "";
     private String mPasswd = "";
 
-    public WifiApAdmin(Context context) {
-        mContext = context;
-        if (mContext == null)
-        {
-            Log.e(TAG, "context is null");
-            return;
+    public static WifiApAdmin getInstance() {
+        if (s_wifiApAdmin == null) {
+            s_wifiApAdmin = new WifiApAdmin();
         }
+        return s_wifiApAdmin;
+    }
 
-        closeWifiAp();
+    private WifiApAdmin() {
+
     }
 
     public String getSSID(){
@@ -45,15 +44,16 @@ public class WifiApAdmin {
     }
 
     @SuppressWarnings("deprecation") // Deprecated because it doesn't handle IPv6 but wifimanager only supports IPV4 anyway
-    public String getGateway()
+    public String getGateway(Context context)
     {
-        if (mContext == null)
-        {
-            return "";
-        }
-        final WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-        DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
-        return Formatter.formatIpAddress(dhcpInfo.gateway);
+//        if (context == null)
+//        {
+//            return "";
+//        }
+//        final WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+//        DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
+//        return Formatter.formatIpAddress(dhcpInfo.gateway);
+        return "192.168.43.1";
     }
 
     public enum WifiResult {
@@ -65,21 +65,26 @@ public class WifiApAdmin {
         void onEvent(WifiResult status);
     }
 
-    public void startWifiAp(String ssid, String passwd, final StartWifiApListener listener) {
+    public void startWifiAp(final Context context, String ssid, String passwd, final StartWifiApListener listener) {
+        if (context == null){
+            return;
+        }
+
         mSSID = ssid;
         mPasswd = passwd;
 
-        if (mWifiManager.isWifiEnabled()) {
-            mWifiManager.setWifiEnabled(false);
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        if (wifiManager.isWifiEnabled()) {
+            wifiManager.setWifiEnabled(false);
         }
 
-        startWifiAp();
+        startWifiAp(context);
 
         MyTimerCheck timerCheck = new MyTimerCheck() {
 
             @Override
             public void doTimerCheckWork() {
-                if (isWifiApEnabled()) {
+                if (isWifiApEnabled(context)) {
                     Log.v(TAG, "Wifi enabled success!");
                     if (listener != null) {
                         listener.onEvent(WifiResult.WIFI_START);
@@ -101,9 +106,13 @@ public class WifiApAdmin {
         timerCheck.start(15, 1000);
     }
 
-    private void startWifiAp() {
+    private void startWifiAp(Context context) {
+        if (context == null) {
+            return ;
+        }
         try {
-            Method method1 = mWifiManager.getClass().getMethod("setWifiApEnabled",
+            WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+            Method method1 = wifiManager.getClass().getMethod("setWifiApEnabled",
                     WifiConfiguration.class, boolean.class);
             WifiConfiguration netConfig = new WifiConfiguration();
 
@@ -125,7 +134,7 @@ public class WifiApAdmin {
             netConfig.allowedGroupCiphers
                     .set(WifiConfiguration.GroupCipher.TKIP);
 
-            method1.invoke(mWifiManager, netConfig, true);
+            method1.invoke(wifiManager, netConfig, true);
 
         } catch (IllegalArgumentException e) {
             // TODO Auto-generated catch block
@@ -145,17 +154,16 @@ public class WifiApAdmin {
         }
     }
 
-    public void closeWifiAp() {
+    public void closeWifiAp(Context context) {
+        if (context == null) {
+            return;
+        }
         mSSID = "";
         mPasswd = "";
 
-        if (mContext == null) {
-            return;
-        }
-
-        if (isWifiApEnabled()) {
+        if (isWifiApEnabled(context)) {
             try {
-                WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+                WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
                 Method method = wifiManager.getClass().getMethod("getWifiApConfiguration");
                 method.setAccessible(true);
 
@@ -179,15 +187,15 @@ public class WifiApAdmin {
         }
     }
 
-    public boolean isWifiApEnabled() {
+    public boolean isWifiApEnabled(Context context) {
         try {
-            if (mContext == null) {
+            if (context == null) {
                 mSSID = "";
                 mPasswd = "";
                 return false;
             }
 
-            WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+            WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
             Method method = wifiManager.getClass().getMethod("isWifiApEnabled");
             method.setAccessible(true);
             return (Boolean) method.invoke(wifiManager);

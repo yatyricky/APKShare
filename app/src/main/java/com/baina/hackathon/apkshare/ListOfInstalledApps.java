@@ -14,6 +14,7 @@ import android.widget.ListView;
 import com.baina.hackathon.apkFinder.ApkFinder;
 import com.baina.hackathon.apkFinder.AppInfo;
 import com.baina.hackathon.apkFinder.AppInfoAdapter;
+import com.baina.hackathon.wifiControl.WifiApAdmin;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.Map;
 public class ListOfInstalledApps extends AppCompatActivity implements DialogInputAPInfo.NoticeDialogListener {
 
     private Activity current;
+    private WifiApAdmin wifiApAdmin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +31,7 @@ public class ListOfInstalledApps extends AppCompatActivity implements DialogInpu
         setContentView(R.layout.activity_list_of_installed_apps);
 
         current = this;
+        wifiApAdmin = WifiApAdmin.getInstance();
 
         // Loading all apps
         ProgressDialog progress = new ProgressDialog(current);

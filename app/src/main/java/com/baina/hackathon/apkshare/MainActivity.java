@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     public final static String INTENT_KEY_APK_URI = "apk_uri";
     public final static String INTENT_KEY_SSID = "ap_ssid";
     public final static String INTENT_KEY_PASSWORD = "ap_password";
+    public final static String INTENT_KEY_APADMIN = "ap_admin";
 
     private Context context;
 
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         context = this;
 
-        wifiApAdmin = new WifiApAdmin(this);
+        wifiApAdmin = WifiApAdmin.getInstance();
 
         Button btn = (Button)findViewById(R.id.dimensionalBtn);
         btn.setOnClickListener(new View.OnClickListener() {
@@ -65,8 +66,8 @@ public class MainActivity extends AppCompatActivity {
         btnWifiAp.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                if (!wifiApAdmin.isWifiApEnabled()){
-                    wifiApAdmin.startWifiAp(Build.MODEL, "123456789", new WifiApAdmin.StartWifiApListener() {
+                if (!wifiApAdmin.isWifiApEnabled(getBaseContext())){
+                    wifiApAdmin.startWifiAp(getBaseContext(), Build.MODEL, "123456789", new WifiApAdmin.StartWifiApListener() {
                         @Override
                         public void onEvent(WifiApAdmin.WifiResult status) {
                             switch (status) {
@@ -96,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 TextView textView = (TextView) findViewById(R.id.ipText);
-                String ipAddress = wifiApAdmin.getGateway();
+                String ipAddress = wifiApAdmin.getGateway(getBaseContext());
                 textView.setText(ipAddress == null ? "null" : ipAddress);
             }
         });

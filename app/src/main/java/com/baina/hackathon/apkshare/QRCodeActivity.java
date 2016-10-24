@@ -2,13 +2,21 @@ package com.baina.hackathon.apkshare;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baina.hackathon.httpServer.http.TransferServer;
+import com.baina.hackathon.wifiControl.WifiApAdmin;
+
+import org.nanohttpd.util.ServerRunner;
+
 public class QRCodeActivity extends AppCompatActivity {
+    private WifiApAdmin wifiApAdmin;
+    private String pkgPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +27,7 @@ public class QRCodeActivity extends AppCompatActivity {
         String message = bundle.getString(MainActivity.INTENT_KEY_APK_URI);
         String ssid = bundle.getString(MainActivity.INTENT_KEY_SSID);
         String password = bundle.getString(MainActivity.INTENT_KEY_PASSWORD);
+        wifiApAdmin = WifiApAdmin.getInstance();
 
         TextView txtView = (TextView) findViewById(R.id.textViewQRCode);
         txtView.setText(message);
@@ -29,8 +38,8 @@ public class QRCodeActivity extends AppCompatActivity {
         TextView textViewPassword = (TextView) findViewById(R.id.textViewPassword);
         textViewPassword.setText(password);
 
-        enableServer();
-        showQRCode(message);
+        pkgPath = message;
+        enableServer(ssid, password);
     }
 
     private void showQRCode(String data) {
@@ -47,6 +56,50 @@ public class QRCodeActivity extends AppCompatActivity {
         }
     }
 
-    private void enableServer() {
+
+
+    private void enableServer(String ssid, String password) {
+        WifiApAdmin.StartWifiApListener wifiApListener = new  WifiApAdmin.StartWifiApListener() {
+
+            @Override
+            public void onEvent(WifiApAdmin.WifiResult status) {
+                switch(status) {
+                    // Hotspot enabled
+                    case WIFI_START:
+                        TransferServer server = new TransferServer(8080);
+                        server.setRootDir(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + getPackageName());
+                        ServerRunner.executeInstance(server);
+
+                        runThread();
+
+                        break;
+                    case WIFI_FAIL:
+                        break;
+                }
+            }
+
+            private void runThread() {
+
+                new Thread() {
+                    public void run() {
+                        try {
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    String uri = "http://" + wifiApAdmin.getGateway(getBaseContext()) + ":8080/" + pkgPath;
+                                    showQRCode(uri);
+                                }
+                            });
+                            Thread.sleep(300);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
+            }
+        };
+
+        this.wifiApAdmin.startWifiAp(getBaseContext(), ssid, password, wifiApListener);
     }
 }
