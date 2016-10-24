@@ -3,13 +3,12 @@ package com.baina.hackathon.apkshare;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class QRCodeActivity extends AppCompatActivity {
-    public static final int QR_WIDTH = 512;
-    public static final int QR_HEIGHT = 512;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +35,11 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
     private void showQRCode(String data) {
-        Bitmap bitmap = QRBuilder.buildQRBitmap(data, QR_WIDTH, QR_HEIGHT);
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        int width = (int)(displaymetrics.widthPixels * 0.8);
+
+        Bitmap bitmap = QRBuilder.buildQRBitmap(data, width, width);
         if (bitmap != null) {
             ImageView imageView = (ImageView) findViewById(R.id.imageView);
             imageView.setImageBitmap(bitmap);
