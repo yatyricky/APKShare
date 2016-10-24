@@ -4,6 +4,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import com.baina.hackathon.wifiControl.WifiApControl;
+
 public class QRCodeActivity extends AppCompatActivity {
 
     @Override
@@ -16,5 +18,11 @@ public class QRCodeActivity extends AppCompatActivity {
 
         TextView txtView = (TextView) findViewById(R.id.textViewQRCode);
         txtView.setText(message);
+
+        WifiApControl.openWifiAp(getBaseContext(), "test-hot-pot", "123456789");
+        enableServer();
+    }
+
+    private void enableServer() {
     }
 }
