@@ -54,11 +54,10 @@ public class TransferServer extends NanoHTTPD {
             uri = uri.substring(0, uri.indexOf('?'));
         }
 
-        uri = uri + ".apk";
         File f = new File(rootDir, uri);
 
         //String mimeTypeForFile = getMimeTypeForFile(uri);
-        String mimeTypeForFile = "application/vnd.android";
+        String mimeTypeForFile = "application/vnd.android.package-archive";
         Response response = serveFile(uri, headers, f, mimeTypeForFile);
         return response != null ? response : getNotFoundResponse();
     }
