@@ -10,13 +10,39 @@
     <TextView
         android:text="TextView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="17dp"
         android:id="@+id/textViewQRCode"
-        tools:layout_constraintTop_creator="1"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginLeft="16dp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/attack"
+        android:id="@+id/imageView"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/textViewPassword"
+        app:layout_constraintLeft_toLeftOf="@+id/textViewPassword" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewSSID"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/textViewQRCode"
+        app:layout_constraintLeft_toLeftOf="@+id/textViewQRCode" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewPassword"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/textViewSSID"
+        app:layout_constraintLeft_toLeftOf="@+id/textViewSSID" />
+
 </android.support.constraint.ConstraintLayout>

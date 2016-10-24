@@ -1,10 +1,12 @@
 package com.baina.hackathon.apkshare;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -14,9 +16,11 @@ import com.baina.hackathon.apkFinder.ApkFinder;
 import com.baina.hackathon.apkFinder.AppInfo;
 import com.baina.hackathon.apkFinder.AppInfoAdapter;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class ListOfInstalledApps extends AppCompatActivity {
+public class ListOfInstalledApps extends AppCompatActivity implements DialogInputAPInfo.NoticeDialogListener {
 
     private Activity current;
 
@@ -42,18 +46,36 @@ public class ListOfInstalledApps extends AppCompatActivity {
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long arg3) {
-                // Get app info
-                AppInfoAdapter ada = (AppInfoAdapter) adapterView.getAdapter();
-                List<AppInfo> la = ada.getAppInfos();
-                AppInfo app = la.get(i);
+            private android.app.FragmentManager fm = current.getFragmentManager();
 
-                // Doing in background
-                ProgressDialog progress = new ProgressDialog(current);
-                progress.setMessage("Loading...");
-                new CopyTask(progress).execute(app);
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long arg3) {
+                // Get AP info
+                DialogInputAPInfo apInfoDialog = new DialogInputAPInfo();
+
+                Map<String, Object> cargo = new HashMap<String, Object>();
+                cargo.put("Context", current);
+                cargo.put("AdapterView", adapterView);
+                cargo.put("Integer", new Integer(i));
+                apInfoDialog.passObjects(cargo);
+
+                apInfoDialog.show(fm, "string");
             }}
         );
+    }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        Map<String, Object> cargo = ((DialogInputAPInfo)dialog).getObjects();
+
+        // Get app info
+        AppInfoAdapter ada = (AppInfoAdapter) ((AdapterView)cargo.get("AdapterView")).getAdapter();
+        List<AppInfo> la = ada.getAppInfos();
+        AppInfo app = la.get(((Integer)cargo.get("Integer")).intValue());
+
+        // Doing in background
+        ProgressDialog progress = new ProgressDialog(current);
+        progress.setMessage("Loading...");
+        new CopyTask(progress).execute(app, dialog);
     }
 
     /**
@@ -90,7 +112,7 @@ public class ListOfInstalledApps extends AppCompatActivity {
     /**
      * Extracting apk & copying to sd card may take a while, hence doing in background.
      */
-    private class CopyTask extends AsyncTask<AppInfo, Integer, String> {
+    private class CopyTask extends AsyncTask<Object, Integer, Bundle> {
 
         private ProgressDialog progress = null;
 
@@ -102,20 +124,28 @@ public class ListOfInstalledApps extends AppCompatActivity {
             progress.show();
         }
 
-        public String doInBackground(AppInfo... params) {
-            AppInfo app = params[0];
+        public Bundle doInBackground(Object... params) {
+            AppInfo app = (AppInfo)params[0];
+            DialogInputAPInfo dialog = (DialogInputAPInfo)params[1];
+
             String pkgPath = ApkFinder.copyAppToSdcard(current, app);
-            return pkgPath;
+            Bundle extras = new Bundle();
+
+            extras.putString(MainActivity.INTENT_KEY_APK_URI, pkgPath);
+            extras.putString(MainActivity.INTENT_KEY_SSID, dialog.getSSID());
+            extras.putString(MainActivity.INTENT_KEY_PASSWORD, dialog.getPassword());
+            return extras;
         }
 
         protected void onProgressUpdate(Integer... values) {
 
         }
 
-        public void onPostExecute(String result) {
+        public void onPostExecute(Bundle result) {
             // Pass path to QRCode Activity
             Intent intent = new Intent(current, QRCodeActivity.class);
-            intent.putExtra(MainActivity.INTENT_KEY_APK_URI, result);
+            intent.putExtras(result);
+
             startActivity(intent);
 
             progress.dismiss();
