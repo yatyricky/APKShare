@@ -9,14 +9,15 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.baina.hackathon.httpServer.NHttpFileServer;
+import com.baina.hackathon.httpServer.tempfiles.TempFilesServer;
 import com.baina.hackathon.wifiControl.WifiApAdmin;
 import com.baina.hackathon.wifiControl.WifiApControl;
 
 import android.widget.ListView;
 import com.baina.hackathon.apkFinder.ApkFinder;
 import com.baina.hackathon.apkFinder.AppInfoAdapter;
-import com.baina.hackathon.wifiControl.WifiApControl;
+
+import org.nanohttpd.util.ServerRunner;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private final static int QR_HEIGHT = 200;
 
     private Context context;
+    private TempFilesServer fileServer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,14 +58,18 @@ public class MainActivity extends AppCompatActivity {
         btnStartServer.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                try {
-                    NHttpFileServer.startServer(this.getClass().getResource("/").toString(), 8080);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                fileServer = new TempFilesServer();
+                fileServer.setTempFileManagerFactory(new TempFilesServer.ExampleManagerFactory());
+                ServerRunner.executeInstance(fileServer);
+            }
+        });
 
+        Button btnShowWifiApIp = (Button) findViewById(R.id.getHostIp);
+        btnShowWifiApIp.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
                 TextView textView = (TextView) findViewById(R.id.ipText);
-                String ipAddress = WifiApAdmin.getWifiApIpAddress();
+                String ipAddress = WifiApAdmin.getGateway(getBaseContext());
                 textView.setText(ipAddress == null ? "null" : ipAddress);
             }
         });

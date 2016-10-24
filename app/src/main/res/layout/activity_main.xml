@@ -41,6 +41,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <Button
+        android:id="@+id/getHostIp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="show wifi ap ip"/>
+
     <TextView
         android:id="@+id/ipText"
         android:layout_width="wrap_content"

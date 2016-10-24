@@ -4,8 +4,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import android.content.Context;
+import android.net.DhcpInfo;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.text.format.Formatter;
 import android.util.Log;
 import java.net.*;
 import java.util.Enumeration;
@@ -16,9 +18,29 @@ import java.util.Enumeration;
 public class WifiApAdmin {
     public static final String TAG = "WifiApAdmin";
 
+    private WifiManager mWifiManager = null;
+
+    private Context mContext = null;
+
+    public WifiApAdmin(Context context) {
+        mContext = context;
+
+        mWifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+
+        closeWifiAp(mWifiManager);
+    }
+
     public static void closeWifiAp(Context context) {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         closeWifiAp(wifiManager);
+    }
+
+    @SuppressWarnings("deprecation") // Deprecated because it doesn't handle IPv6 but wifimanager only supports IPV4 anyway
+    public static String getGateway(Context context)
+    {
+        final WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
+        return Formatter.formatIpAddress(dhcpInfo.gateway);
     }
 
     public static String getWifiApIpAddress() {
@@ -42,18 +64,6 @@ public class WifiApAdmin {
             Log.e(TAG, ex.toString());
         }
         return null;
-    }
-
-    private WifiManager mWifiManager = null;
-
-    private Context mContext = null;
-
-    public WifiApAdmin(Context context) {
-        mContext = context;
-
-        mWifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-
-        closeWifiAp(mWifiManager);
     }
 
     private String mSSID = "";
@@ -138,7 +148,7 @@ public class WifiApAdmin {
         }
     }
 
-    private static void closeWifiAp(WifiManager wifiManager) {
+    public static void closeWifiAp(WifiManager wifiManager) {
         if (isWifiApEnabled(wifiManager)) {
             try {
                 Method method = wifiManager.getClass().getMethod("getWifiApConfiguration");
