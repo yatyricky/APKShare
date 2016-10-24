@@ -62,6 +62,10 @@ public class AppInfoAdapter extends BaseAdapter {
         return view;
     }
 
+    public List<AppInfo> getAppInfos() {
+        return mlistAppInfo;
+    }
+
     class ViewHolder {
         ImageView appIcon;
         TextView tvAppLabel;
