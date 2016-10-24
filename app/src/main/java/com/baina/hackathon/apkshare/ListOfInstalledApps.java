@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -52,7 +51,7 @@ public class ListOfInstalledApps extends AppCompatActivity implements DialogInpu
                 // Get AP info
                 DialogInputAPInfo apInfoDialog = new DialogInputAPInfo();
 
-                Map<String, Object> cargo = new HashMap<String, Object>();
+                Map<String, Object> cargo = new HashMap<>();
                 cargo.put("Context", current);
                 cargo.put("AdapterView", adapterView);
                 cargo.put("Integer", new Integer(i));

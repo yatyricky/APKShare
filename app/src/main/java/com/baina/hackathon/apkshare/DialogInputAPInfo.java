@@ -1,17 +1,13 @@
 package com.baina.hackathon.apkshare;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-
-import com.baina.hackathon.wifiControl.WifiApControl;
 
 import java.util.Map;
 
@@ -61,7 +57,8 @@ public class DialogInputAPInfo extends DialogFragment {
         mListener = (NoticeDialogListener) this.cargo.get("Context");
         current = this;
 
-        view =inflater.inflate(R.layout.dialog_input_ap_info, null);
+        view = inflater.inflate(R.layout.dialog_input_ap_info, null);
+        builder.setTitle(R.string.input_ap_info);
 
         builder.setView(view)
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {

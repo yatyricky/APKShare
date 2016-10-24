@@ -1,13 +1,11 @@
 package com.baina.hackathon.apkshare;
 
 import android.graphics.Bitmap;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.baina.hackathon.wifiControl.WifiApControl;
 
 public class QRCodeActivity extends AppCompatActivity {
     public static final int QR_WIDTH = 512;
