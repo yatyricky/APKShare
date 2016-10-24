@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 import com.baina.hackathon.httpServer.http.FilesServer;
 import com.baina.hackathon.apkFinder.AppInfo;
+import com.baina.hackathon.httpServer.http.TransferServer;
 import com.baina.hackathon.wifiControl.WifiApAdmin;
 import com.baina.hackathon.wifiControl.WifiApControl;
 
@@ -61,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         btnWifiAp.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                WifiApControl.openWifiAp(getBaseContext(), "test-hot-pot", "123456789");
+                WifiApControl.openWifiAp(getBaseContext(), "test-hot-pot-yi", "123456789");
             }
         });
 
@@ -69,8 +71,11 @@ public class MainActivity extends AppCompatActivity {
         btnStartServer.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                fileServer = new FilesServer();
-                ServerRunner.executeInstance(fileServer);
+//                fileServer = new FilesServer();
+//                ServerRunner.executeInstance(fileServer);
+                TransferServer server = new TransferServer(8080);
+                server.setRootDir(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + getPackageName());
+                ServerRunner.executeInstance(server);
             }
         });
 
