@@ -6,9 +6,9 @@
 
     <ImageView
         android:id="@+id/imgApp"
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:contentDescription="App info" />
+        android:contentDescription="App info"
+        android:layout_width="40dip"
+        android:layout_height="40dip" />
 
     <RelativeLayout
         android:layout_width="fill_parent"
