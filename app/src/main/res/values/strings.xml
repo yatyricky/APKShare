@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">ApkShare</string>
+    <string name="app_name">Telebytes</string>
     <string name="title_activity_list_of_installed_apps">ListOfInstalledApps</string>
     <string name="ok">OK</string>
-    <string name="input_ap_info">Input AP Info</string>
+    <string name="input_ap_info">Input Hotspot Info</string>
     <string name="cancel">Cancel</string>
 </resources>
