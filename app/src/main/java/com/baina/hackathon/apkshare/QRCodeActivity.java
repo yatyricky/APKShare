@@ -30,6 +30,7 @@ public class QRCodeActivity extends AppCompatActivity {
         wifiApAdmin = WifiApAdmin.getInstance();
 
         TextView txtView = (TextView) findViewById(R.id.textViewQRCode);
+        message = "http://" + wifiApAdmin.getGateway(getBaseContext()) + ":8080/" + message;
         txtView.setText(message);
 
         TextView textViewssid = (TextView) findViewById(R.id.textViewSSID);
